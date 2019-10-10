@@ -40,7 +40,10 @@ int main() {
     for (int i = 0; i < 8; i++) {
         premise    = evaluate_premise(rows[i][0], rows[i][1], rows[i][2]);
         conclusion = evaluate_conclusion(rows[i][0], rows[i][1], rows[i][2]);
-        if (premise && !conclusion) { invalid_rows.push_back(i); };
+
+        if (premise && !conclusion) {
+          invalid_rows.push_back(i);
+        };
 
         cout << i
              << "      "
@@ -63,6 +66,30 @@ int main() {
             cout << "The argument is invalid in row " << invalid_rows[i] << "\n";
         }
     }
+
+    bool p = false, q = true, r = false;
+
+    cout << "Row 5.\nPremise: "
+         << to_str(evaluate_premise(p, q, r))
+         << "\nConclusion: "
+         << to_str(evaluate_conclusion(p, q, r))
+         << "\n(p V q): "
+         << to_str(p || q)
+         << "\n(q -> r): "
+         << to_str(_conditional(q, r))
+         << "\n((p V q) ^ (q -> r)): "
+         << to_str((p || q) && (_conditional(q, r)))
+         << "\n(p ^ r): "
+         << to_str(p && r)
+         << "\n((p V q) ^ (q -> r)) XOR (p ^ r): "
+         << to_str(_xor(((p || q) && _conditional(q, r)), p && r))
+         << "\n(r ^ q): "
+         << to_str(r && q)
+         << "\n((p V q) ^ (q -> r)) XOR (p ^ r) <-> (r ^ q))"
+         << to_str(_biconditional(_xor(((p || q) && _conditional(q, r)), p && r), r && q))
+         << "\nConclusion: "
+         << to_str(p || r);
+
 }
 
 string to_str(bool b) {
@@ -86,9 +113,9 @@ bool evaluate_premise(bool p, bool q, bool r) {
     return _biconditional( // <--- Edit me!
         _xor(
             (p || q) && _conditional(q, r),
-            p || r
+            p && r
         ),
-        r || q
+        r && q
     );
 }
 
