@@ -11,28 +11,33 @@ https://stackoverflow.com/questions/5029840/convert-char-to-int-in-c-and-c
 #include <tuple>
 using namespace std;
 
-std::pair<string, string> getInputs();
 int _xor(int a, int b);
+void getInputs(string &input1, string &input2);
+void sanitizeStrings(string &input1, string &input2);
+string run(string &input1, string &input2);
 std::pair<int, int> halfAdder(int a, int b);
 std::pair<int, int> fullAdder(int a, int b, int c);
 
 int main() {
-  std::pair<string, string> inputs = getInputs();
-  string inputOne = inputs.first;
-  string inputTwo = inputs.second;
+  cout << "Michael Zemel\n";
+  for (int runCount = 0; runCount < 4; runCount++) {
+    cout << "Run #" << runCount + 1 << ":\n";
+    string input1, input2, result;
+    getInputs(input1, input2);
 
-  string result;
+    result = run(input1, input2);
 
-  cout << "The numbers to be added are " << inputOne << " and " << inputTwo << "\n";
+    cout << "The answer is " << result << "\n";
+  }
+}
 
+string run(string &input1, string &input2) {
   int a, b, c = 0, sum, carry;
+  string result; 
 
   for (int i = 7; i >= 0; i--) {
-    a = inputOne.at(i) - '0', b = inputTwo.at(i) - '0';
-    // std::pair<int, int> fullAdderResult = fullAdder(a, b, c);
+    a = input1.at(i) - '0', b = input2.at(i) - '0'; // str to int
     std::tie(sum, carry) = fullAdder(a, b, c);
-    // sum = fullAdderResult.first;
-    // carry = fullAdderResult.second;
 
     cout << "The bits are "
        << a 
@@ -47,15 +52,29 @@ int main() {
        << ".\n";
 
     if ((i + 1) % 4 == 0) { result.insert(0, " "); }
-    result.insert(0, std::to_string(sum)); 
+    result.insert(0, std::to_string(sum)); // int to str
     c = carry;
   }
 
-  cout << "The answer is " << result << "\n";
+  if (carry == 1) { result.insert(0, std::to_string(carry) + " "); }
+
+  return result;
 }
 
-std::pair<string, string> getInputs() {
-  return std::make_pair("01010011", "00000101");
+void getInputs(string &input1, string &input2) {
+  cout << "Input one: ";
+  cin >> input1;
+  cout << "Input two: ";
+  cin >> input2;
+
+  sanitizeStrings(input1, input2);
+  cout << "The numbers to be added are " << input1 << " and " << input2 << "\n";
+}
+
+// This is taking me way too long to sanitize the input, so I'm not doing it
+void sanitizeStrings(string &input1, string &input2) {
+  // for (int i = 0; i <= (8 - input1.size()); i++) { input1.insert(0, "0"); }
+  // for (int j = 0; j <= (8 - input2.size()); j++) { input2.insert(0, "0"); }
 }
 
 int _xor(int a, int b) {
@@ -67,13 +86,9 @@ std::pair<int, int> halfAdder(int a, int b) {
 }
 
 std::pair<int, int> fullAdder(int a, int b, int c) {
-  std::pair<int, int> halfAdderResultOne = halfAdder(a, b);
-  int sumOne = halfAdderResultOne.first;
-  int carryOne = halfAdderResultOne.second;
+  int sum1, sum2, carry1, carry2;
+  std::tie(sum1, carry1) = halfAdder(a, b);
+  std::tie(sum2, carry2) = halfAdder(sum1, c);
 
-  std::pair<int, int> halfAdderResultTwo = halfAdder(sumOne, c);
-  int sumTwo = halfAdderResultTwo.first;
-  int carryTwo = halfAdderResultTwo.second;
-
-  return std::make_pair(sumTwo, carryOne || carryTwo);
+  return std::make_pair(sum2, carry1 || carry2);
 }
